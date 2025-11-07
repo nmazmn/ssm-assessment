@@ -144,15 +144,13 @@ After the file transfer succesfully completed the file will be available in serv
 
 ### Running Tests
 ```bash
-# NestJS tests
-cd nestjs-server
-npm test                 # Unit tests
-npm run test:watch      # Watch mode
-npm run test:cov        # Coverage report
+# server tests
+cd server
+pnpm test                 # Unit tests
 
-# Laravel tests
-cd laravel-server
-php artisan test
+# client tests
+cd client
+pnpm test
 ```
 
 ## 🐛 Troubleshooting
