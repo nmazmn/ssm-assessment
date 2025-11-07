@@ -44,6 +44,23 @@ services:
       - broker
       - server
 
+  client2:
+    build: ./client
+    container_name: node-client-2
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - CLIENT_ID=client-456
+      - FILE_PATH=/home/logs/test-100mb.bin #based on the generated file in Dockerfile
+      - MQTT_BROKER_URL=mqtt://broker:1883
+      - SERVER_CHUNK_URL=http://server:3000/uploadchunk
+      - SERVER_COMPLETE_URL=http://server:3000/uploadcomplete
+      - API_KEY=my-super-secret-key-12345
+    depends_on:
+      - broker
+      - server
+
 volumes:
   pnpm_store:
     driver: local
