@@ -121,8 +121,7 @@ async function uploadFileInChunks() {
       totalChunks: totalChunks.toString(),
       originalFilename,
       fullFileHash, // Send the hash for verification
-    }, getAuthConfig()); // Use auth for this call too
-
+    }, getAuthConfig());
     console.log('[Client] File transfer complete and verified by server!');
   } catch (err) {
     console.error('[Client] Error finalizing transfer:', err.message);

@@ -28,22 +28,6 @@ export class AppService {
     });
   }
 
-  // This method is called once the module has been initialized
-  async onModuleInit() {
-    try {
-      this.logger.log('hjahahaha');
-      // Connect to the broker
-      await this.client.connect();
-
-      // THIS IS YOUR LOG
-      this.logger.log('Successfully connected to MQTT broker');
-    } catch (err) {
-      // Log the error if connection fails
-      this.logger.error(`Error connecting to MQTT broker: ${err.message}`);
-    }
-  }
-
-  // ... requestFileFromClient() and saveChunk() are the same ...
   requestFileFromClient(clientId: string) {
     this.logger.log(`Publishing 'request_file' to client: ${clientId}`);
     const topic = `clients/${clientId}/commands`;
@@ -73,12 +57,11 @@ export class AppService {
     return { message: 'Chunk received' };
   }
 
-  // --- This method is UPDATED ---
   async reassembleChunks(body: {
     transferId: string;
     totalChunks: string;
     originalFilename: string;
-    fullFileHash: string; // <-- We get the hash from the client
+    fullFileHash: string; // Get the hash from the client
   }) {
     const tempDir = path.join('uploads', 'temp', body.transferId);
     const finalFilePath = path.join('uploads', body.originalFilename);
@@ -105,10 +88,10 @@ export class AppService {
       writeStream.end();
       await fs.rmdir(tempDir);
 
-      // --- START CHECKSUM VERIFICATION ---
+      // Start checksum verification
       await new Promise<void>((resolve) =>
         writeStream.on('finish', () => resolve()),
-      ); // Wait for file to finish writing// Wait for file to finish writing // Wait for file to finish writing
+      );
 
       this.logger.log(`Reassembly complete. Verifying file integrity...`);
       const fileBuffer = await fs.readFile(finalFilePath);
@@ -130,7 +113,7 @@ export class AppService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      // --- END CHECKSUM VERIFICATION ---
+      // End checksum verification
     } catch (error) {
       this.logger.error('Error reassembling file:', error);
       await fs.remove(tempDir); // Clean up temp dir on failure
