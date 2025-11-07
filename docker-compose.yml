@@ -1,0 +1,44 @@
+# 'version' attribute removed as it is obsolete
+
+services:
+  # The MQTT Broker
+  broker:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto-broker
+    volumes:
+      - ./mosquitto:/mosquitto/config
+    ports:
+      - "1883:1883"
+      - "9001:9001" # For websockets if needed
+
+  # The NestJS Server
+  server:
+    build: ./server
+    container_name: nestjs-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+      - pnpm_store:/root/.local/share/pnpm/store # This line is now valid
+      - ./server-uploads:/usr/src/app/uploads
+    depends_on:
+      - broker
+
+  # The on-premise Client
+  client:
+    build: ./client
+    container_name: node-client
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - broker
+      - server
+
+# --- ADD THIS SECTION ---
+# This defines the 'pnpm_store' volume you referenced in the server service
+volumes:
+  pnpm_store:
+    driver: local

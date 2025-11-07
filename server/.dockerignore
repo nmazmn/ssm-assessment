@@ -1,0 +1,8 @@
+# Ignore pnpm's local dependencies
+node_modules
+
+# Ignore the compiled output
+dist
+
+# IMPORTANT: Ignore uploaded files
+uploads
