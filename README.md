@@ -124,7 +124,7 @@ docker-compose logs -f {container_name}
 
 #### Direct API Calls (For demo purposes the client_id used are client-123 & client-456 representing 2 isolated client machine)
 ```bash
-# 1. Initiate transfer
+# Initiate transfer
 curl --location 'http://localhost:3000/download/{client_id}'
 ```
 
@@ -146,7 +146,7 @@ After the file transfer succesfully completed the file will be available in serv
 ```bash
 # server tests
 cd server
-pnpm test                 # Unit tests
+pnpm test                 
 
 # client tests
 cd client
