@@ -35,7 +35,7 @@ services:
       - /usr/src/app/node_modules
     environment:
       - CLIENT_ID=client-123
-      - FILE_PATH=/usr/src/app/dummy-file.txt
+      - FILE_PATH=/home/logs/test-100mb.bin #based on the generated file in Dockerfile
       - MQTT_BROKER_URL=mqtt://broker:1883
       - SERVER_CHUNK_URL=http://server:3000/uploadchunk
       - SERVER_COMPLETE_URL=http://server:3000/uploadcomplete
