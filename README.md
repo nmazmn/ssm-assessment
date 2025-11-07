@@ -82,7 +82,7 @@ This system demo a solution for transferring large files (100MB+ such as logs fi
 - **Resume Capability**: Failed transfers can resume from last successful chunk
 - **NAT/Firewall Friendly**: Clients initiate all connections (outbound only)
 - **Real-Time Status**: MQTT-based progress tracking and notifications
-- **Hash Sum verification to ensure data integrity
+- **Data ingegrity and retry machanism**: Hash Sum verification to ensure data integrity and will retry if the data corrupted
 
 ## ⚙️ Configuration
 
