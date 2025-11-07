@@ -8,7 +8,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as crypto from 'crypto'; // <-- Import crypto
+import * as crypto from 'crypto';
 import * as mqtt from 'mqtt';
 
 @Injectable()
