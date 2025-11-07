@@ -5,28 +5,21 @@ const axios = require('axios');
 const FormData = require('form-data');
 const crypto = require('crypto');
 
-// --- Configuration ---
-const CLIENT_ID = 'client-123';
-const MQTT_BROKER_URL = 'mqtt://broker:1883';
-const SERVER_CHUNK_URL = 'http://server:3000/upload-chunk';
-const SERVER_COMPLETE_URL = 'http://server:3000/upload-complete';
+// Configuration
+const CLIENT_ID = process.env.CLIENT_ID;
+const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://broker:1883';
+const SERVER_CHUNK_URL = process.env.SERVER_CHUNK_URL || 'http://server:3000/uploadchunk';
+const SERVER_COMPLETE_URL = process.env.SERVER_COMPLETE_URL || 'http://server:3000/uploadcomplete';
 const COMMAND_TOPIC = `clients/${CLIENT_ID}/commands`;
-
-// --- NEW CONFIG ---
-const API_KEY = 'my-super-secret-key-12345'; // Must match the server
+const API_KEY = process.env.API_KEY; // Must match the server
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000; // 2 seconds
+const FILE_PATH = process.env.FILE_PATH
 
-const FILE_PATH = path.join(__dirname, 'dummy-file.txt');
-// On Linux/macOS: truncate -s 100M dummy-file.txt
-// On Windows: fsutil file createnew dummy-file.txt 104857600
-
-
-// --- MQTT Connection (Same as before) ---
+// MQTT Connection
 console.log(`[Client] Connecting to MQTT broker at ${MQTT_BROKER_URL}...`);
 const client = mqtt.connect(MQTT_BROKER_URL);
-// ... (client.on 'connect' and 'message' are the same) ...
 client.on('connect', () => {
   console.log('[Client] Connected to MQTT broker.');
   client.subscribe(COMMAND_TOPIC, (err) => {
@@ -49,7 +42,7 @@ client.on('message', (topic, message) => {
   }
 });
 
-// --- Helper to create auth headers ---
+// Helper to create auth headers
 function getAuthConfig() {
   return {
     headers: {
@@ -59,7 +52,7 @@ function getAuthConfig() {
   };
 }
 
-// --- Helper for calculating file hash ---
+// Helper for calculating file hash
 function getFileHash(filePath) {
   console.log('[Client] Calculating file hash (SHA256)... This may take a moment.');
   const fileBuffer = fs.readFileSync(filePath);
@@ -68,7 +61,7 @@ function getFileHash(filePath) {
   return hash;
 }
 
-// --- UPDATED UPLOAD FUNCTION ---
+// Upload function
 async function uploadFileInChunks() {
   const transferId = crypto.randomUUID();
   const fileStats = fs.statSync(FILE_PATH);
@@ -93,7 +86,6 @@ async function uploadFileInChunks() {
     form.append('chunkIndex', i.toString());
     form.append('file', finalChunk, { filename: `chunk_${i}` });
 
-    // --- NEW RETRY LOGIC ---
     let success = false;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -101,21 +93,21 @@ async function uploadFileInChunks() {
         const config = {
           headers: {
             ...form.getHeaders(),
-            ...getAuthConfig().headers, // Add auth header
+            ...getAuthConfig().headers,
           },
-          timeout: getAuthConfig().timeout, // Add timeout
+          timeout: getAuthConfig().timeout,
         };
         await axios.post(SERVER_CHUNK_URL, form, config);
         success = true;
-        break; // Success! Exit the retry loop
+        break;
       } catch (err) {
         console.error(`[Client] Error uploading chunk ${i} (Attempt ${attempt}):`, err.message);
         if (attempt === MAX_RETRIES) {
           console.error('[Client] Max retries reached. Aborting upload.');
           await fileHandle.close();
-          return; // Stop on final failure
+          return;
         }
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY)); // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
       }
     }
   }
@@ -124,12 +116,11 @@ async function uploadFileInChunks() {
   console.log('[Client] All chunks uploaded. Finalizing transfer...');
 
   try {
-    // Send the "complete" signal with the hash
     await axios.post(SERVER_COMPLETE_URL, {
       transferId,
       totalChunks: totalChunks.toString(),
       originalFilename,
-      fullFileHash, // <-- Send the hash for verification
+      fullFileHash, // Send the hash for verification
     }, getAuthConfig()); // Use auth for this call too
 
     console.log('[Client] File transfer complete and verified by server!');

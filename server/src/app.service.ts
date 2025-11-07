@@ -9,12 +9,23 @@ import { ClientProxy } from '@nestjs/microservices';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as crypto from 'crypto'; // <-- Import crypto
+import * as mqtt from 'mqtt';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
+  private mqttClient: mqtt.MqttClient;
   constructor(@Inject('MQTT_SERVICE') private client: ClientProxy) {
-    this.logger.log('AppService Constructor called. Service is being created.');
+    // Create direct MQTT client for publishing
+    this.mqttClient = mqtt.connect('mqtt://broker:1883');
+
+    this.mqttClient.on('connect', () => {
+      this.logger.log('Direct MQTT client connected to broker');
+    });
+
+    this.mqttClient.on('error', (err) => {
+      this.logger.error('MQTT connection error:', err.message);
+    });
   }
 
   // This method is called once the module has been initialized
@@ -37,7 +48,16 @@ export class AppService {
     this.logger.log(`Publishing 'request_file' to client: ${clientId}`);
     const topic = `clients/${clientId}/commands`;
     const payload = { action: 'request_file_upload' };
-    this.client.emit(topic, JSON.stringify(payload));
+
+    this.mqttClient.publish(topic, JSON.stringify(payload), (err) => {
+      console.log('test');
+      if (err) {
+        this.logger.error(`Failed to publish to ${topic}:`, err.message);
+      } else {
+        this.logger.log(`Successfully published to ${topic}`);
+      }
+    });
+
     return { message: `Request sent to client ${clientId}` };
   }
 

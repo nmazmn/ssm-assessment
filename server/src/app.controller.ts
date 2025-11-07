@@ -8,26 +8,23 @@ import {
   Body,
   HttpException,
   HttpStatus,
-  UseGuards, // <-- Import this
+  UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiKeyAuthGuard } from './auth.guard'; // <-- Import the guard
+import { ApiKeyAuthGuard } from './auth.guard';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  // This endpoint is for you to trigger. It doesn't need auth.
-  @Get('/request-file/:clientId')
+  @Get('/download/:clientId')
   requestFile(@Param('clientId') clientId: string) {
     return this.appService.requestFileFromClient(clientId);
   }
 
-  // --- THESE ENDPOINTS MUST BE SECURED ---
-
-  @Post('/upload-chunk')
-  @UseGuards(ApiKeyAuthGuard) // <-- Apply the guard
+  @Post('/uploadchunk')
+  @UseGuards(ApiKeyAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadChunk(
     @UploadedFile() file: Express.Multer.File,
@@ -39,15 +36,15 @@ export class AppController {
     return this.appService.saveChunk(file, body);
   }
 
-  @Post('/upload-complete')
-  @UseGuards(ApiKeyAuthGuard) // <-- Apply the guard
+  @Post('/uploadcomplete')
+  @UseGuards(ApiKeyAuthGuard)
   async uploadComplete(
     @Body()
     body: {
       transferId: string;
       totalChunks: string;
       originalFilename: string;
-      fullFileHash: string; // <-- Now expecting the hash
+      fullFileHash: string;
     },
   ) {
     return this.appService.reassembleChunks(body);

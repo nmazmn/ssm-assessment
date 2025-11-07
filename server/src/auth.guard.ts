@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 
 // THIS IS YOUR SECRET KEY. PUT IT IN A .env FILE IN A REAL APP!
-const EXPECTED_API_KEY = 'my-super-secret-key-12345';
+const EXPECTED_API_KEY = process.env.API_KEY;
 
 @Injectable()
 export class ApiKeyAuthGuard implements CanActivate {

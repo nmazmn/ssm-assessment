@@ -9,7 +9,7 @@ const CLIENT_MODULES = ClientsModule.register([
     name: 'MQTT_SERVICE',
     transport: Transport.MQTT,
     options: {
-      url: 'mqtt://broker:1883',
+      url: process.env.MQTT_BROKER_URL || 'mqtt://broker:1883',
     },
   },
 ]);
