@@ -83,6 +83,7 @@ This system demo a solution for transferring large files (100MB+ such as logs fi
 - **NAT/Firewall Friendly**: Clients initiate all connections (outbound only)
 - **Real-Time Status**: MQTT-based progress tracking and notifications
 - **Data ingegrity and retry machanism**: Hash Sum verification to ensure data integrity and will retry if the data corrupted
+- **Retry mechanism**: The client will attempt to retry the upload process if some error occured
 
 ## ⚙️ Configuration
 
