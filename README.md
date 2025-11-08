@@ -140,7 +140,7 @@ docker-compose logs -f node-client
 docker-compose logs -f mosaquitto-broker
 ```
 
-After the file transfer succesfully completed the file will be available in server upload folder.
+After the file transfer succesfully completed the file will be available in generated server-uploads folder.
 
 ### Running Tests
 ```bash
