@@ -208,4 +208,4 @@ docker-compose run -e CHUNK_SIZE=10485760 client node client.js
 ```
 
 ## ✨ Demo video
-[View demo video](https://drive.google.com/file/d/17UBPnqWtLeL1KTcCX3xN3PureV8Fm3x3/view?usp=sharing)
+[View demo video](https://drive.google.com/file/d/1pf5mkQfPs5H1a0PAt1gU1k7MdYTcGB9A/view?usp=sharing)
